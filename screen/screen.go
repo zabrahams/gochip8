@@ -1,8 +1,8 @@
-package main
+package screen
 
 import (
 	"github.com/veandco/go-sdl2/sdl"
-	"github.com/zachabrahams/gochip8/chip8"
+	"github.com/zabrahams/gochip8/chip8"
 )
 
 const SCALING_FACTOR = 10

@@ -6,13 +6,32 @@ import (
 	"os"
 
 	"github.com/veandco/go-sdl2/sdl"
-	"github.com/zachabrahams/gochip8/chip8"
+	"github.com/zabrahams/gochip8/beeper"
+	"github.com/zabrahams/gochip8/chip8"
+	"github.com/zabrahams/gochip8/screen"
 )
 
+const helpMsg = `
+gochip8 is a chip 8 emulator! 
+You can use it as follows:
+./gochip8 mode rom
+where mode is either:
+	run - runs the rom
+	dis - dissassembles the rom
+	debug - runs the rom in debug mode
+and rom is a path to the rom
+`
+
 func main() {
+
+	if len(os.Args) < 3 {
+		fmt.Println(helpMsg)
+		os.Exit(1)
+	}
+
 	subcommand := os.Args[1]
 	if subcommand == "" {
-		panic("need subcommand: run or dis")
+		panic("need subcommand: run, dis or debug")
 	}
 	programFile := os.Args[2]
 	if programFile == "" {
@@ -27,7 +46,7 @@ func main() {
 	case "dis":
 		dis(programFile)
 	default:
-		panic("unknown command")
+		panic(fmt.Sprintf("unknown command: %s", subcommand))
 	}
 
 }
@@ -53,10 +72,10 @@ func debug(programFile string) {
 	)
 	fmt.Println("Starting Chip8 Emulator")
 
-	screen := NewScreen()
+	screen := screen.NewScreen()
 	defer screen.Close()
 
-	beeper := NewSDLBeeper()
+	beeper := beeper.NewSDLBeeper()
 	defer beeper.Close()
 
 	c8 := chip8.NewChip8(beeper)
@@ -80,7 +99,7 @@ func debug(programFile string) {
 			}
 		}
 		if !running {
-			fmt.Print("command: ")
+			fmt.Print("command: (h for help) ")
 			fmt.Scanln(&command)
 			switch command {
 			case "s":
@@ -91,6 +110,8 @@ func debug(programFile string) {
 				running = true
 			case "q":
 				quit = true
+			case "h":
+				fmt.Println("you can use the following commands (s)tep, (r)un, (q)uit.  you can also use '.' to stop the running program.")
 			}
 		}
 		kbState := sdl.GetKeyboardState()
@@ -106,10 +127,10 @@ func debug(programFile string) {
 func run(programFile string) {
 	fmt.Println("Starting Chip8 Emulator")
 
-	screen := NewScreen()
+	screen := screen.NewScreen()
 	defer screen.Close()
 
-	beeper := NewSDLBeeper()
+	beeper := beeper.NewSDLBeeper()
 	defer beeper.Close()
 
 	c8 := chip8.NewChip8(beeper)
